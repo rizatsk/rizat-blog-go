@@ -1,6 +1,47 @@
-# Service API With Golang
+# Rizat Blog - Service Go API
 
-### Struktur Folder
+Backend RESTful API for a blog platform built with **Golang** and **Gin Framework**, following the principles of **Clean Architecture**.
+
+---
+
+## 🛠️ Tech Stack & Package List
+
+Below is the list of core libraries and third-party packages used in this project:
+
+### Core & Framework
+* **[Go](https://go.dev/)** `v1.27+` - Core programming language.
+* **[Gin Web Framework](https://github.com/gin-gonic/gin)** (`github.com/gin-gonic/gin`) - High-performance HTTP web framework.
+
+### Database & Migration
+* **[GORM](https://gorm.io/)** (`gorm.io/gorm`) - ORM library for database operations and data seeding.
+* **[GORM PostgreSQL Driver](https://gorm.io/driver/postgres)** (`gorm.io/driver/postgres`) - Official PostgreSQL driver for GORM.
+* **[golang-migrate](https://github.com/golang-migrate/migrate)** (`github.com/golang-migrate/migrate/v4`) - Database migration tool and library for executing SQL schema migrations (`up`/`down`).
+
+### Security & Utilities
+* **[Crypto / Bcrypt](https://golang.org/x/crypto/bcrypt)** (`golang.org/x/crypto/bcrypt`) - Secure password hashing library for user/admin authentication.
+* **[godotenv](https://github.com/joho/godotenv)** (`github.com/joho/godotenv`) - Loads environment variables from a `.env` file.
+* **[godotenv](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
+
+### Code Quality & Security Tools (Dev)
+* **[Snyk](https://snyk.io/)** - Static Application Security Testing (SAST) & dependency vulnerability scanner.
+Check and scan snyk you can run :
+```
+snyk auth // for authentication your account
+snyk monitor
+```
+
+---
+
+## Initial Apps
+### Install GoLang
+https://go.dev/dl/
+
+### Install packages
+```
+go mod download
+```
+
+## Struktur Folder
 ```
 my-gin-app/
 ├── cmd/
@@ -31,28 +72,28 @@ my-gin-app/
 └── Makefile    # Command for running
 ```
 
-### Migrations
-#### Install golang migrate
+## Migrations
+### Install golang migrate
 via homebrew
 ```
 brew install golang-migrate
 ```
-#### Create File Migrations
+### Create File Migrations
 ```
 migrate create -ext sql -dir database/migrations_postgres -seq name_execute
 ```
 
-#### Run migrations
+### Run migrations
 ```
 make migrate up
 ```
 
-#### Run migrate down
+### Run migrate down
 ```
 make migrate down
 ```
 
-#### Run seeder
+### Run seeder
 ```
 make migrate db-seed
 ```
