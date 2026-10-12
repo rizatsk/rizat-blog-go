@@ -6,6 +6,7 @@ import (
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/handler"
 	"service_blog_go/internal/service"
+	"service_blog_go/pkg/database"
 
 	"github.com/gin-gonic/gin"
 )
@@ -13,6 +14,10 @@ import (
 func main() {
 	environemt := config.LoadEnvironment()
 	port := environemt.Port
+
+	// connection db postgres
+	db_postgres := database.InitPostgres(environemt)
+	_ = db_postgres
 
 	healthService := service.NewHealthService()
 	healthHandler := handler.NewHealthHandler(healthService)
