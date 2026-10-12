@@ -13,6 +13,7 @@ Below is the list of core libraries and third-party packages used in this projec
 * **[Gin Web Framework](https://github.com/gin-gonic/gin)** (`github.com/gin-gonic/gin`) - High-performance HTTP web framework.
 
 ### Database & Migration
+* **[Postgres](https://postgresql.org)** - Database for account user 
 * **[GORM](https://gorm.io/)** (`gorm.io/gorm`) - ORM library for database operations and data seeding.
 * **[GORM PostgreSQL Driver](https://gorm.io/driver/postgres)** (`gorm.io/driver/postgres`) - Official PostgreSQL driver for GORM.
 * **[golang-migrate](https://github.com/golang-migrate/migrate)** (`github.com/golang-migrate/migrate/v4`) - Database migration tool and library for executing SQL schema migrations (`up`/`down`).
@@ -20,7 +21,7 @@ Below is the list of core libraries and third-party packages used in this projec
 ### Security & Utilities
 * **[Crypto / Bcrypt](https://golang.org/x/crypto/bcrypt)** (`golang.org/x/crypto/bcrypt`) - Secure password hashing library for user/admin authentication.
 * **[godotenv](https://github.com/joho/godotenv)** (`github.com/joho/godotenv`) - Loads environment variables from a `.env` file.
-* **[godotenv](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
+* **[uuid](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
 
 ### Code Quality & Security Tools (Dev)
 * **[Snyk](https://snyk.io/)** - Static Application Security Testing (SAST) & dependency vulnerability scanner.
