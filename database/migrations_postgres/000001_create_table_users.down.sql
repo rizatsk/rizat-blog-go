@@ -1,0 +1,1 @@
+DROP TABLE IF EXISTS rizat_blog.users;

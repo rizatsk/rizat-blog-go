@@ -13,8 +13,8 @@ import (
 func InitPostgres(environemnt *config.Environment) *gorm.DB {
 	// DSN (data source name)
 	dsn := fmt.Sprintf(
-		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s search_path=%s TimeZone=Asia/Jakarta",
-		environemnt.DBPGHost, environemnt.DBPGUsername, environemnt.DBPGPassword, environemnt.DBPGName, environemnt.DBPGPort, environemnt.DBPGSSLMode, environemnt.DBPGSchema,
+		"host=%s user=%s password=%s dbname=%s port=%s sslmode=%s TimeZone=Asia/Jakarta",
+		environemnt.DBPGHost, environemnt.DBPGUsername, environemnt.DBPGPassword, environemnt.DBPGName, environemnt.DBPGPort, environemnt.DBPGSSLMode,
 	)
 
 	db_postgres, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})

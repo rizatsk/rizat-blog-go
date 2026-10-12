@@ -8,16 +8,17 @@ import (
 )
 
 type Environment struct {
-	Port         string
-	AppName      string
-	AppEnv       string
-	DBPGHost     string
-	DBPGPort     string
-	DBPGUsername string
-	DBPGPassword string
-	DBPGName     string
-	DBPGSSLMode  string
-	DBPGSchema   string
+	Port           string
+	AppName        string
+	AppEnv         string
+	DBPGHost       string
+	DBPGPort       string
+	DBPGUsername   string
+	DBPGPassword   string
+	DBPGName       string
+	DBPGSSLMode    string
+	DBPGSchema     string
+	PWDefaultAdmin string
 }
 
 func LoadEnvironment() *Environment {
@@ -27,16 +28,17 @@ func LoadEnvironment() *Environment {
 	}
 
 	return &Environment{
-		Port:         getEnv("PORT", "8000"),
-		AppName:      getEnv("APP_NAME", "rizat-service-blog"),
-		AppEnv:       getEnv("APP_ENV", "development"),
-		DBPGHost:     getEnv("DB_PG_HOST", "localhost"),
-		DBPGPort:     getEnv("DB_PG_PORT", "5432"),
-		DBPGUsername: getEnv("DB_PG_USERNAME", "postgres"),
-		DBPGPassword: getEnv("DB_PG_PASSWORD", ""),
-		DBPGName:     getEnv("DB_PG_NAME", "my_db"),
-		DBPGSSLMode:  getEnv("DB_PG_SSLMODE", "disable"),
-		DBPGSchema:   getEnv("DB_PG_SCHEMA", "public"),
+		Port:           getEnv("PORT", "8000"),
+		AppName:        getEnv("APP_NAME", "rizat-service-blog"),
+		AppEnv:         getEnv("APP_ENV", "development"),
+		DBPGHost:       getEnv("DB_PG_HOST", "localhost"),
+		DBPGPort:       getEnv("DB_PG_PORT", "5432"),
+		DBPGUsername:   getEnv("DB_PG_USERNAME", "postgres"),
+		DBPGPassword:   getEnv("DB_PG_PASSWORD", ""),
+		DBPGName:       getEnv("DB_PG_NAME", "my_db"),
+		DBPGSSLMode:    getEnv("DB_PG_SSLMODE", "disable"),
+		DBPGSchema:     getEnv("BD_PG_SCHEMA", "public"),
+		PWDefaultAdmin: getEnv("PW_DEFAULT_ADMIN", "admin"),
 	}
 }
 
