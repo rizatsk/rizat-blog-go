@@ -15,7 +15,7 @@ func NewHealthHandler(service domain.HealthService) *HealthHandler {
 	return &HealthHandler{healthService: service}
 }
 
-func (h *HealthHandler) Ping(c *gin.Context) {
-	reponse := h.healthService.CheckHealth(c.Request.Context())
-	c.JSON(http.StatusOK, reponse)
+func (health *HealthHandler) Ping(ctx *gin.Context) {
+	reponse := health.healthService.CheckHealth(ctx.Request.Context())
+	ctx.JSON(http.StatusOK, reponse)
 }
