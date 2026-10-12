@@ -98,3 +98,18 @@ make migrate down
 ```
 make migrate db-seed
 ```
+## Run Apps
+### Running dev
+```
+make run-dev
+```
+
+### Build binary
+```
+make build
+```
+
+### Run production (binary)
+```
+./app
+```

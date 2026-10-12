@@ -1,4 +1,7 @@
-.PHONY: run-dev migrate-up migrate-down db-seed
+.PHONY: build run-dev migrate-up migrate-down db-seed
+
+build:
+	go build -o app cmd/api/main.go
 
 run-dev:
 	go run cmd/api/main.go
