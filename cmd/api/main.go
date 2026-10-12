@@ -26,6 +26,6 @@ func main() {
 
 	serverAddr := fmt.Sprintf(":%s", port)
 	if err := route.Run(serverAddr); err != nil {
-		log.Fatal("Failed to run server: %v", err)
+		log.Fatalf("Failed to run server: %v", err)
 	}
 }
