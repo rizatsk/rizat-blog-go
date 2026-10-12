@@ -22,6 +22,7 @@ Below is the list of core libraries and third-party packages used in this projec
 * **[Crypto / Bcrypt](https://golang.org/x/crypto/bcrypt)** (`golang.org/x/crypto/bcrypt`) - Secure password hashing library for user/admin authentication.
 * **[godotenv](https://github.com/joho/godotenv)** (`github.com/joho/godotenv`) - Loads environment variables from a `.env` file.
 * **[uuid](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
+* **[Air](https://github.com/air-verse/air)** (`github.com/air-verse/air`) - Live reload tool development
 
 ### Code Quality & Security Tools (Dev)
 * **[Snyk](https://snyk.io/)** - Static Application Security Testing (SAST) & dependency vulnerability scanner.
@@ -99,6 +100,11 @@ make migrate down
 make migrate db-seed
 ```
 ## Run Apps
+### Running apps
+```
+make run
+```
+
 ### Running dev
 ```
 make run-dev

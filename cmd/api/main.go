@@ -12,14 +12,14 @@ import (
 )
 
 func main() {
-	environemt := config.LoadEnvironment()
-	port := environemt.Port
+	env := config.LoadEnvironment()
+	port := env.Port
 
 	// connection db postgres
-	db_postgres := database.InitPostgres(environemt)
+	db_postgres := database.InitPostgres(env)
 	_ = db_postgres
 
-	healthService := service.NewHealthService()
+	healthService := service.NewHealthService(env)
 	healthHandler := handler.NewHealthHandler(healthService)
 
 	route := gin.Default()
