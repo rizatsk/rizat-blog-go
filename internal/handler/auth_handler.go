@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
+	"service_blog_go/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,13 +25,23 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 	var req domain.LoginRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Failed(
+			ctx,
+			http.StatusBadRequest,
+			"Bad request payload",
+			err.Error(),
+		)
 		return
 	}
 
-	token, user, err := authHandler.userService.Login(ctx.Request.Context(), &req)
+	token, err := authHandler.userService.Login(ctx.Request.Context(), &req)
 	if err != nil {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		response.Failed(
+			ctx,
+			http.StatusUnauthorized,
+			"Failed login",
+			err.Error(),
+		)
 		return
 	}
 
@@ -44,13 +55,10 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 		true,  // http only (javascript cannot read this cookie)
 	)
 
-	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Login is success",
-		"data": gin.H{
-			"id":    user.ID,
-			"name":  user.Name,
-			"email": user.Email,
-			"role":  user.Role,
-		},
-	})
+	response.Success(
+		ctx,
+		http.StatusOK,
+		"Login success",
+		nil,
+	)
 }

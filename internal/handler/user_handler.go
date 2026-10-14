@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
-	"time"
+	"service_blog_go/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,10 +23,10 @@ func NewUserHandler(userService domain.UserService, env *config.Environment) *Us
 
 func (user *UserHandler) GetUserByToken(ctx *gin.Context) {
 	dataUser := user.userService.GetUser(ctx)
-	ctx.JSON(http.StatusOK, gin.H{
-		"status":     "success",
-		"message":    "Success get dat user",
-		"data":       dataUser,
-		"created_at": time.Now().Format(user.env.FormatDateTime),
-	})
+	response.Success(
+		ctx,
+		http.StatusOK,
+		"Success get data user",
+		dataUser,
+	)
 }

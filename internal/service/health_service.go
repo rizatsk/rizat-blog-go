@@ -16,13 +16,9 @@ func NewHealthService(env *config.Environment) domain.HealthService {
 	}
 }
 
-func (service *healthService) CheckHealth(ctx context.Context) *domain.HealthResponse {
-	return &domain.HealthResponse{
-		Status:  "OK",
-		Message: "Server is healthy and running smoothly",
-		Data: domain.DataHealthResponse{
-			AppName: service.env.AppName,
-			AppEnv:  service.env.AppEnv,
-		},
+func (service *healthService) CheckHealth(ctx context.Context) *domain.DataHealthResponse {
+	return &domain.DataHealthResponse{
+		AppName: service.env.AppName,
+		AppEnv:  service.env.AppEnv,
 	}
 }

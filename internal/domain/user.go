@@ -38,7 +38,7 @@ type UserRepository interface {
 }
 
 type UserService interface {
-	Login(ctx context.Context, req *LoginRequest) (string, *User, error)
+	Login(ctx context.Context, req *LoginRequest) (string, error)
 	GetUser(ctx *gin.Context) *GetUser
 }
 

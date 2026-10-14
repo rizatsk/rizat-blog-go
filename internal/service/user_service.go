@@ -35,17 +35,17 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 
-func (userService *UserService) Login(ctx context.Context, req *domain.LoginRequest) (string, *domain.User, error) {
+func (userService *UserService) Login(ctx context.Context, req *domain.LoginRequest) (string, error) {
 	user, err := userService.userRepo.FindByEmail(ctx, req.Email)
 	if err != nil {
 		log.Printf("User is not registered, error: %v", err)
-		return "", nil, errors.New("Email or password is wrong")
+		return "", errors.New("Email or password is wrong")
 	}
 
 	err_validate_pass := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err_validate_pass != nil {
 		log.Printf("Password is wrong, err : %v", err_validate_pass)
-		return "", nil, errors.New("Email or password is wrong")
+		return "", errors.New("Email or password is wrong")
 	}
 
 	claims := JWTClaims{
@@ -65,10 +65,10 @@ func (userService *UserService) Login(ctx context.Context, req *domain.LoginRequ
 	tokenString, err := token.SignedString([]byte(userService.env.JWTSecretKey))
 	if err != nil {
 		log.Printf("Failed generate token jwt error: %v", err)
-		return "", nil, errors.New("Failed generate token jwt")
+		return "", errors.New("Failed generate token jwt")
 	}
 
-	return tokenString, user, nil
+	return tokenString, nil
 }
 
 func (userService UserService) GetUser(ctx *gin.Context) *domain.GetUser {
