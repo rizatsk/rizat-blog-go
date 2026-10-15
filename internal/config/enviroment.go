@@ -41,7 +41,7 @@ func getEnvInt(key string, fallback int) int {
 
 	valueInt, err := strconv.Atoi(valueStr)
 	if err != nil {
-		log.Printf("Failed convert value to int used default value, error: ", err)
+		log.Printf("Failed convert value to int used default value, error: %v", err)
 		return fallback
 	}
 
