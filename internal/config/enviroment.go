@@ -64,7 +64,7 @@ func LoadEnvironment() *Environment {
 		DBPGPassword:    getEnv("DB_PG_PASSWORD", ""),
 		DBPGName:        getEnv("DB_PG_NAME", "my_db"),
 		DBPGSSLMode:     getEnv("DB_PG_SSLMODE", "disable"),
-		DBPGSchema:      getEnv("BD_PG_SCHEMA", "public"),
+		DBPGSchema:      getEnv("DB_PG_SCHEMA", "public"),
 		PWDefaultAdmin:  getEnv("PW_DEFAULT_ADMIN", "admin"),
 		JWTSecretKey:    getEnv("JWT_SECRET_KEY", ""),
 		JWTExpiredHours: getEnvInt("JWT_EXPIRED_HOURS", 1),
