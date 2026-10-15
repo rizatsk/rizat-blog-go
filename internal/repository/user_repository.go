@@ -18,7 +18,7 @@ func NewUserRepository(db *gorm.DB) domain.UserRepository {
 func (userRepo *userRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	var user domain.User
 
-	err := userRepo.db.WithContext(ctx).Table(user.TableName()).Where("email=?", email).First(&user).Error
+	err := userRepo.db.WithContext(ctx).Table(user.TableName()).Where("email=?", email).Take(&user).Error
 	if err != nil {
 		return nil, err
 	}
