@@ -25,12 +25,14 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 	var req domain.LoginRequest
 
 	if err := ctx.ShouldBindJSON(&req); err != nil {
+		formatedErr := response.FormValidationError(err)
 		response.Failed(
 			ctx,
-			http.StatusBadRequest,
-			"Bad request payload",
-			err.Error(),
+			http.StatusUnprocessableEntity,
+			"Bad request",
+			formatedErr,
 		)
+
 		return
 	}
 
