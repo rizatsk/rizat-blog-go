@@ -88,17 +88,17 @@ migrate create -ext sql -dir database/migrations_postgres -seq name_execute
 
 ### Run migrations
 ```
-make migrate up
+make migrate-up
 ```
 
 ### Run migrate down
 ```
-make migrate down
+make migrate-down
 ```
 
 ### Run seeder
 ```
-make migrate db-seed
+make db-seed
 ```
 ## Run Apps
 ### Running apps
