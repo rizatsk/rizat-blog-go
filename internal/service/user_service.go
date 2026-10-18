@@ -6,8 +6,8 @@ import (
 	"log"
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
+	"service_blog_go/pkg/asynclock"
 	"service_blog_go/pkg/tokenize"
-	"sync"
 	"uuid"
 
 	"github.com/gin-gonic/gin"
@@ -18,13 +18,15 @@ type UserService struct {
 	userRepo domain.UserRepository
 	authRepo domain.AuthTokenRepository
 	env      *config.Environment
+	syncLock *asynclock.SyncLock
 }
 
-func NewUserService(userRepo domain.UserRepository, authRepo domain.AuthTokenRepository, env *config.Environment) domain.UserService {
+func NewUserService(userRepo domain.UserRepository, authRepo domain.AuthTokenRepository, env *config.Environment, syncLock *asynclock.SyncLock) domain.UserService {
 	return &UserService{
 		userRepo: userRepo,
 		authRepo: authRepo,
 		env:      env,
+		syncLock: syncLock,
 	}
 }
 
@@ -54,53 +56,35 @@ func (userService *UserService) Login(ctx context.Context, req *domain.LoginRequ
 		return nil, errors.New("Failed generate refresh token jwt")
 	}
 
+	// Locking
+	userService.syncLock.Lock(req.Email)
+	defer userService.syncLock.Unlock(req.Email)
+
 	authTokens, err := userService.authRepo.GetAuthTokenByUserId(ctx, user.ID)
 	if err != nil {
 		log.Printf("Failed get tokens user from table : %v", err)
 		return nil, errors.New("Failed get tokens user from table")
 	}
 
-	errChan := make(chan error, 2)
-	var waitGroup sync.WaitGroup
-	waitGroup.Add(2)
-	ctxBackground := context.Background()
-
-	go func() {
-		defer waitGroup.Done()
-
-		if len(authTokens) >= userService.env.UserMaxDevice {
-			var idsTokenOld []string
-			for i := userService.env.UserMaxDevice - 1; i < len(authTokens); i++ {
-				idsTokenOld = append(idsTokenOld, authTokens[i].ID)
-			}
-
-			var errDeleteToken error
-			errDeleteToken = userService.authRepo.DeleteTokenByIds(ctxBackground, idsTokenOld)
-			if errDeleteToken != nil {
-				log.Printf("Failed delete token by id : %v", errDeleteToken)
-				errChan <- errors.New("Failed delete token by id")
-			}
+	if len(authTokens) >= userService.env.UserMaxDevice {
+		var idsTokenOld []string
+		for i := userService.env.UserMaxDevice - 1; i < len(authTokens); i++ {
+			idsTokenOld = append(idsTokenOld, authTokens[i].ID)
 		}
-	}()
 
-	go func() {
-		defer waitGroup.Done()
-
-		var errInsertToken error
-		errInsertToken = userService.authRepo.InsertToken(ctxBackground, authTokenId, user.ID)
-		if errInsertToken != nil {
-			log.Printf("Failed create token from table : %v", errInsertToken)
-			errChan <- errors.New("Failed create token from table")
+		var errDeleteToken error
+		errDeleteToken = userService.authRepo.DeleteTokenByIds(ctx, idsTokenOld)
+		if errDeleteToken != nil {
+			log.Printf("Failed delete token by id : %v", errDeleteToken)
+			return nil, errors.New("Failed delete token by id")
 		}
-	}()
+	}
 
-	go func() {
-		waitGroup.Wait()
-		close(errChan)
-	}()
-
-	if len(errChan) > 0 {
-		return nil, errors.New("Internal server error")
+	var errInsertToken error
+	errInsertToken = userService.authRepo.InsertToken(ctx, authTokenId, user.ID)
+	if errInsertToken != nil {
+		log.Printf("Failed create token from table : %v", errInsertToken)
+		return nil, errors.New("Failed create token from table")
 	}
 
 	return &domain.Login{TokenString: tokenString, RefreshTokenString: refreshTokenString}, nil

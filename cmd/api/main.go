@@ -8,6 +8,7 @@ import (
 	"service_blog_go/internal/handler/middleware"
 	"service_blog_go/internal/repository"
 	"service_blog_go/internal/service"
+	"service_blog_go/pkg/asynclock"
 	"service_blog_go/pkg/database"
 
 	"github.com/gin-gonic/gin"
@@ -19,13 +20,14 @@ func main() {
 
 	// connection db postgres
 	db_postgres := database.InitPostgres(env)
+	asyncLock := asynclock.NewSycnLock()
 
 	healthService := service.NewHealthService(env)
 	healthHandler := handler.NewHealthHandler(healthService)
 
 	userRepo := repository.NewUserRepository(db_postgres)
 	authRepo := repository.NewauthTokenRepository(db_postgres)
-	userService := service.NewUserService(userRepo, authRepo, env)
+	userService := service.NewUserService(userRepo, authRepo, env, asyncLock)
 	userHandler := handler.NewUserHandler(userService)
 	authHandler := handler.NewAuthHandler(userService, env)
 
