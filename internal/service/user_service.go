@@ -6,69 +6,104 @@ import (
 	"log"
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
-	"time"
+	"service_blog_go/pkg/tokenize"
+	"sync"
+	"uuid"
 
 	"github.com/gin-gonic/gin"
-	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type UserService struct {
 	userRepo domain.UserRepository
+	authRepo domain.AuthTokenRepository
 	env      *config.Environment
 }
 
-func NewUserService(userRepo domain.UserRepository, env *config.Environment) domain.UserService {
+func NewUserService(userRepo domain.UserRepository, authRepo domain.AuthTokenRepository, env *config.Environment) domain.UserService {
 	return &UserService{
 		userRepo: userRepo,
+		authRepo: authRepo,
 		env:      env,
 	}
 }
 
-type JWTClaims struct {
-	UserID    string `json:"user_id"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Role      string `json:"role"`
-	CreatedAt string `json:"created_at"`
-	UpdatedAt string `json:"updated_at"`
-	jwt.RegisteredClaims
-}
-
-func (userService *UserService) Login(ctx context.Context, req *domain.LoginRequest) (string, error) {
+func (userService *UserService) Login(ctx context.Context, req *domain.LoginRequest) (*domain.Login, error) {
 	user, err := userService.userRepo.FindByEmail(ctx, req.Email)
 	if err != nil {
 		log.Printf("User is not registered, error: %v", err)
-		return "", errors.New("Email or password is wrong")
+		return nil, errors.New("Email or password is wrong")
 	}
 
 	err_validate_pass := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err_validate_pass != nil {
 		log.Printf("Password is wrong, err : %v", err_validate_pass)
-		return "", errors.New("Email or password is wrong")
+		return nil, errors.New("Email or password is wrong")
 	}
 
-	claims := JWTClaims{
-		UserID:    user.ID,
-		Name:      user.Name,
-		Email:     user.Email,
-		Role:      user.Role,
-		CreatedAt: user.CreatedAt.Format(userService.env.FormatDateTime),
-		UpdatedAt: user.UpdatedAt.Format(userService.env.FormatDateTime),
-		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(userService.env.JWTExpiredHours) * time.Hour)),
-			IssuedAt:  jwt.NewNumericDate(time.Now()),
-		},
-	}
-
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString([]byte(userService.env.JWTSecretKey))
+	tokenString, err := tokenize.GenerateAccessToken(userService.env, user)
 	if err != nil {
 		log.Printf("Failed generate token jwt error: %v", err)
-		return "", errors.New("Failed generate token jwt")
+		return nil, errors.New("Failed generate token jwt")
 	}
 
-	return tokenString, nil
+	authTokenId := uuid.NewV7().String()
+	refreshTokenString, err := tokenize.GenerateRefreshToken(userService.env, authTokenId, user.ID)
+	if err != nil {
+		log.Printf("Failed generate refersh token jwt error: %v", err)
+		return nil, errors.New("Failed generate refresh token jwt")
+	}
+
+	authTokens, err := userService.authRepo.GetAuthTokenByUserId(ctx, user.ID)
+	if err != nil {
+		log.Printf("Failed get tokens user from table : %v", err)
+		return nil, errors.New("Failed get tokens user from table")
+	}
+
+	errChan := make(chan error, 2)
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(2)
+	ctxBackground := context.Background()
+
+	go func() {
+		defer waitGroup.Done()
+
+		if len(authTokens) >= userService.env.UserMaxDevice {
+			var idsTokenOld []string
+			for i := userService.env.UserMaxDevice - 1; i < len(authTokens); i++ {
+				idsTokenOld = append(idsTokenOld, authTokens[i].ID)
+			}
+
+			var errDeleteToken error
+			errDeleteToken = userService.authRepo.DeleteTokenByIds(ctxBackground, idsTokenOld)
+			if errDeleteToken != nil {
+				log.Printf("Failed delete token by id : %v", errDeleteToken)
+				errChan <- errors.New("Failed delete token by id")
+			}
+		}
+	}()
+
+	go func() {
+		defer waitGroup.Done()
+
+		var errInsertToken error
+		errInsertToken = userService.authRepo.InsertToken(ctxBackground, authTokenId, user.ID)
+		if errInsertToken != nil {
+			log.Printf("Failed create token from table : %v", errInsertToken)
+			errChan <- errors.New("Failed create token from table")
+		}
+	}()
+
+	go func() {
+		waitGroup.Wait()
+		close(errChan)
+	}()
+
+	if len(errChan) > 0 {
+		return nil, errors.New("Internal server error")
+	}
+
+	return &domain.Login{TokenString: tokenString, RefreshTokenString: refreshTokenString}, nil
 }
 
 func (userService UserService) GetUser(ctx *gin.Context) *domain.GetUser {

@@ -2,7 +2,6 @@ package handler
 
 import (
 	"net/http"
-	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
 	"service_blog_go/pkg/response"
 
@@ -11,13 +10,11 @@ import (
 
 type UserHandler struct {
 	userService domain.UserService
-	env         *config.Environment
 }
 
-func NewUserHandler(userService domain.UserService, env *config.Environment) *UserHandler {
+func NewUserHandler(userService domain.UserService) *UserHandler {
 	return &UserHandler{
 		userService: userService,
-		env:         env,
 	}
 }
 

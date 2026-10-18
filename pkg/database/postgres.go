@@ -29,10 +29,10 @@ func InitPostgres(environemnt *config.Environment) *gorm.DB {
 	}
 
 	// Limit max conenction open to DB
-	sqlDB.SetMaxOpenConns(25)
+	sqlDB.SetMaxOpenConns(15)
 
 	// Limit max connection idle ready for reused
-	sqlDB.SetMaxIdleConns(10)
+	sqlDB.SetMaxIdleConns(5)
 
 	// Max duration connection idle before closed
 	sqlDB.SetConnMaxIdleTime(15 * time.Minute)

@@ -5,6 +5,7 @@ import (
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
 	"service_blog_go/pkg/response"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -38,9 +39,13 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 
 	token, err := authHandler.userService.Login(ctx.Request.Context(), &req)
 	if err != nil {
+		statusCode := http.StatusInternalServerError
+		if err.Error() == "Email or password is wrong" {
+			statusCode = http.StatusUnauthorized
+		}
 		response.Failed(
 			ctx,
-			http.StatusUnauthorized,
+			statusCode,
 			"Failed login",
 			err.Error(),
 		)
@@ -48,13 +53,23 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 	}
 
 	ctx.SetCookie(
-		"token", // name cookie
-		token,   // value cookie
+		"token",           // name cookie
+		token.TokenString, // value cookie
 		authHandler.env.JWTExpiredHours*60*60, // expired from second
 		"/",   // appicable path
 		"",    // domain, (for localhost is blank)
 		false, // secure  (set true when using ssl)
 		true,  // http only (javascript cannot read this cookie)
+	)
+
+	ctx.SetCookie(
+		"refreshToken",           // name cookie
+		token.RefreshTokenString, // value cookie
+		authHandler.env.JWTRfreshTokenExpiredDays*24*60*int(time.Hour), // expired from second
+		"/api/v1/auth/refresh", // appicable path
+		"",                     // domain, (for localhost is blank)
+		false,                  // secure  (set true when using ssl)
+		true,                   // http only (javascript cannot read this cookie)
 	)
 
 	response.Success(

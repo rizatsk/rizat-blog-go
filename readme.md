@@ -96,6 +96,11 @@ make migrate-up
 make migrate-down
 ```
 
+### Run migrate down per step
+```
+make migrate-down-step
+```
+
 ### Run seeder
 ```
 make db-seed

@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 	"service_blog_go/internal/config"
-	"service_blog_go/internal/service"
+	"service_blog_go/pkg/tokenize"
 
 	"github.com/bytedance/gopkg/util/logger"
 	"github.com/gin-gonic/gin"
@@ -20,8 +20,8 @@ func AuthMiddleware(env *config.Environment) gin.HandlerFunc {
 			return
 		}
 
-		claims := &service.JWTClaims{}
-		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (interface{}, error) {
+		claims := &tokenize.JWTClaims{}
+		token, err := jwt.ParseWithClaims(tokenString, claims, func(token *jwt.Token) (any, error) {
 			return []byte(env.JWTSecretKey), nil
 		})
 		if err != nil || !token.Valid {

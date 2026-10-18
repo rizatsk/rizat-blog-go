@@ -33,12 +33,17 @@ type GetUser struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type Login struct {
+	TokenString        string
+	RefreshTokenString string
+}
+
 type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
 }
 
 type UserService interface {
-	Login(ctx context.Context, req *LoginRequest) (string, error)
+	Login(ctx context.Context, req *LoginRequest) (*Login, error)
 	GetUser(ctx *gin.Context) *GetUser
 }
 
