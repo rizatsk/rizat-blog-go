@@ -1,0 +1,51 @@
+package repository
+
+import (
+	"context"
+	"service_blog_go/internal/domain"
+	"service_blog_go/pkg/time"
+
+	"gorm.io/gorm"
+)
+
+type authTokenRepository struct {
+	db *gorm.DB
+}
+
+func NewauthTokenRepository(db *gorm.DB) domain.AuthTokenRepository {
+	return &authTokenRepository{db: db}
+}
+
+func (authTokenRepo *authTokenRepository) GetAuthTokenByUserId(ctx context.Context, userId string) ([]domain.AuthToken, error) {
+	var authToken []domain.AuthToken
+
+	err := authTokenRepo.db.WithContext(ctx).
+		Where("user_id=?", userId).
+		Order("created_at DESC").
+		Find(&authToken).Error
+	if err != nil {
+		return nil, err
+	}
+	return authToken, nil
+}
+
+func (authTokenRepo *authTokenRepository) InsertToken(ctx context.Context, id string, userId string) error {
+	newAuthToken := domain.AuthToken{
+		ID:        id,
+		UserId:    userId,
+		CreatedAt: time.TimeNoewFormat(),
+	}
+	if err := authTokenRepo.db.WithContext(ctx).Create(newAuthToken).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (authTokenRepo *authTokenRepository) DeleteTokenByIds(ctx context.Context, ids []string) error {
+	if err := authTokenRepo.db.WithContext(ctx).Where("id IN ?", ids).Delete(&domain.AuthToken{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}

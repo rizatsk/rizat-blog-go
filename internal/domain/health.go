@@ -7,12 +7,6 @@ type DataHealthResponse struct {
 	AppEnv  string `json:"appEnv"`
 }
 
-type HealthResponse struct {
-	Status  string             `json:"status"`
-	Message string             `json:"message"`
-	Data    DataHealthResponse `json:"data"`
-}
-
 type HealthService interface {
-	CheckHealth(ctx context.Context) *HealthResponse
+	CheckHealth(ctx context.Context) *DataHealthResponse
 }

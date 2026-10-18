@@ -23,6 +23,7 @@ Below is the list of core libraries and third-party packages used in this projec
 * **[godotenv](https://github.com/joho/godotenv)** (`github.com/joho/godotenv`) - Loads environment variables from a `.env` file.
 * **[uuid](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
 * **[Air](https://github.com/air-verse/air)** (`github.com/air-verse/air`) - Live reload tool development
+* **[JWT](https://github.com/golang-jwt/jwt/v5)** (`github.com/golang-jwt/jwt/v5`) - JWT for token auth
 
 ### Code Quality & Security Tools (Dev)
 * **[Snyk](https://snyk.io/)** - Static Application Security Testing (SAST) & dependency vulnerability scanner.
@@ -87,17 +88,22 @@ migrate create -ext sql -dir database/migrations_postgres -seq name_execute
 
 ### Run migrations
 ```
-make migrate up
+make migrate-up
 ```
 
 ### Run migrate down
 ```
-make migrate down
+make migrate-down
+```
+
+### Run migrate down per step
+```
+make migrate-down-step
 ```
 
 ### Run seeder
 ```
-make migrate db-seed
+make db-seed
 ```
 ## Run Apps
 ### Running apps

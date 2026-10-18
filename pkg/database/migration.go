@@ -39,3 +39,12 @@ func RunMigrationsDown(env *config.Environment) {
 	}
 	log.Println("Success run migrate down")
 }
+
+func RunMigrationsDownStep(env *config.Environment) {
+	dbMigrate := MigrationInstance(env)
+
+	if err := dbMigrate.Steps(-1); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		log.Fatalf("Failed run mgirate down step :%v", err)
+	}
+	log.Println("Success run migrate down step")
+}

@@ -5,7 +5,10 @@ import (
 	"log"
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/handler"
+	"service_blog_go/internal/handler/middleware"
+	"service_blog_go/internal/repository"
 	"service_blog_go/internal/service"
+	"service_blog_go/pkg/asynclock"
 	"service_blog_go/pkg/database"
 
 	"github.com/gin-gonic/gin"
@@ -17,16 +20,24 @@ func main() {
 
 	// connection db postgres
 	db_postgres := database.InitPostgres(env)
-	_ = db_postgres
+	asyncLock := asynclock.NewSycnLock()
 
 	healthService := service.NewHealthService(env)
 	healthHandler := handler.NewHealthHandler(healthService)
+
+	userRepo := repository.NewUserRepository(db_postgres)
+	authRepo := repository.NewauthTokenRepository(db_postgres)
+	userService := service.NewUserService(userRepo, authRepo, env, asyncLock)
+	userHandler := handler.NewUserHandler(userService)
+	authHandler := handler.NewAuthHandler(userService, env)
 
 	route := gin.Default()
 
 	v1 := route.Group("/api/v1")
 	{
 		v1.GET("/health", healthHandler.Ping)
+		v1.POST("/auth", authHandler.Login)
+		v1.GET("/user", middleware.AuthMiddleware(env), userHandler.GetUserByToken)
 	}
 
 	serverAddr := fmt.Sprintf(":%s", port)

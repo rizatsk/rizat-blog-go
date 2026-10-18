@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"service_blog_go/internal/domain"
+	"service_blog_go/pkg/response"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,6 +17,12 @@ func NewHealthHandler(service domain.HealthService) *HealthHandler {
 }
 
 func (health *HealthHandler) Ping(ctx *gin.Context) {
-	reponse := health.healthService.CheckHealth(ctx.Request.Context())
-	ctx.JSON(http.StatusOK, reponse)
+	reponseHealth := health.healthService.CheckHealth(ctx.Request.Context())
+
+	response.Success(
+		ctx,
+		http.StatusOK,
+		"Service is healthy",
+		reponseHealth,
+	)
 }

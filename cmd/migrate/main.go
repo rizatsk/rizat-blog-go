@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	action := flag.String("action", "up", "Action command: 'up', 'down', or 'seed-up'")
+	action := flag.String("action", "up", "Action command: 'up', 'down', 'down-step', or 'seed-up'")
 	flag.Parse()
 
 	env := config.LoadEnvironment()
@@ -24,6 +24,9 @@ func main() {
 	case "down":
 		log.Println("Running migrate down...")
 		database.RunMigrationsDown(env)
+	case "down-step":
+		log.Println("Running migrate down...")
+		database.RunMigrationsDownStep(env)
 	case "seed-up":
 		db_postgres := database.InitPostgres(env)
 		seeder.RunAll(db_postgres, env)
