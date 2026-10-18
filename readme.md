@@ -24,6 +24,7 @@ Below is the list of core libraries and third-party packages used in this projec
 * **[uuid](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
 * **[Air](https://github.com/air-verse/air)** (`github.com/air-verse/air`) - Live reload tool development
 * **[JWT](https://github.com/golang-jwt/jwt/v5)** (`github.com/golang-jwt/jwt/v5`) - JWT for token auth
+* **[Validator](https://github.com/go-playground/validator/v10)** (`github.com/go-playground/validator/v10`) - Validator request
 
 ### Code Quality & Security Tools (Dev)
 * **[Snyk](https://snyk.io/)** - Static Application Security Testing (SAST) & dependency vulnerability scanner.
@@ -42,6 +43,8 @@ https://go.dev/dl/
 ### Install packages
 ```
 go mod download
+
+go mod tidy
 ```
 
 ## Struktur Folder
