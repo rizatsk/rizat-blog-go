@@ -11,13 +11,13 @@ import (
 )
 
 type AuthHandler struct {
-	userService domain.UserService
+	authService domain.AuthService
 	env         *config.Environment
 }
 
-func NewAuthHandler(userService domain.UserService, env *config.Environment) *AuthHandler {
+func NewAuthHandler(authService domain.AuthService, env *config.Environment) *AuthHandler {
 	return &AuthHandler{
-		userService: userService,
+		authService: authService,
 		env:         env,
 	}
 }
@@ -37,7 +37,7 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 		return
 	}
 
-	token, err := authHandler.userService.Login(ctx.Request.Context(), &req)
+	token, err := authHandler.authService.Login(ctx.Request.Context(), &req)
 	if err != nil {
 		statusCode := http.StatusInternalServerError
 		if err.Error() == "Email or password is wrong" {

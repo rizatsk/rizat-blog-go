@@ -19,11 +19,6 @@ type User struct {
 	UpdatedAt time.Time `json:"updated_at"`
 }
 
-type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=6"`
-}
-
 type GetUser struct {
 	UserId    string `json:"user_id"`
 	Name      string `json:"name"`
@@ -33,17 +28,11 @@ type GetUser struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
-type Login struct {
-	TokenString        string
-	RefreshTokenString string
-}
-
 type UserRepository interface {
 	FindByEmail(ctx context.Context, email string) (*User, error)
 }
 
 type UserService interface {
-	Login(ctx context.Context, req *LoginRequest) (*Login, error)
 	GetUser(ctx *gin.Context) *GetUser
 }
 

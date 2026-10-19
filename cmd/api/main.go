@@ -26,10 +26,12 @@ func main() {
 	healthHandler := handler.NewHealthHandler(healthService)
 
 	userRepo := repository.NewUserRepository(db_postgres)
-	authRepo := repository.NewauthTokenRepository(db_postgres)
-	userService := service.NewUserService(userRepo, authRepo, env, asyncLock)
+	userService := service.NewUserService(userRepo, env)
 	userHandler := handler.NewUserHandler(userService)
-	authHandler := handler.NewAuthHandler(userService, env)
+
+	authRepo := repository.NewauthTokenRepository(db_postgres)
+	authService := service.NewAuthService(userRepo, authRepo, env, asyncLock)
+	authHandler := handler.NewAuthHandler(authService, env)
 
 	route := gin.Default()
 
