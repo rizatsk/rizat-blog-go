@@ -1,6 +1,6 @@
-# Rizat Blog - Service Go API
+# Template - Service Go API With GIN
 
-Backend RESTful API for a blog platform built with **Golang** and **Gin Framework**, following the principles of **Clean Architecture**.
+Backend RESTful API for a platform built with **Golang** and **Gin Framework**, following the principles of **Clean Architecture**.
 
 ---
 
@@ -24,6 +24,7 @@ Below is the list of core libraries and third-party packages used in this projec
 * **[uuid](https://github.com/google/uuid)** (`github.com/google/uuid`) - Generate universal uniq id
 * **[Air](https://github.com/air-verse/air)** (`github.com/air-verse/air`) - Live reload tool development
 * **[JWT](https://github.com/golang-jwt/jwt/v5)** (`github.com/golang-jwt/jwt/v5`) - JWT for token auth
+* **[Validator](https://github.com/go-playground/validator/v10)** (`github.com/go-playground/validator/v10`) - Validator request
 
 ### Code Quality & Security Tools (Dev)
 * **[Snyk](https://snyk.io/)** - Static Application Security Testing (SAST) & dependency vulnerability scanner.
@@ -42,6 +43,8 @@ https://go.dev/dl/
 ### Install packages
 ```
 go mod download
+
+go mod tidy
 ```
 
 ## Struktur Folder
@@ -49,30 +52,44 @@ go mod download
 my-gin-app/
 ├── cmd/
 │   └── api/
-│       └── main.go           # Entry point aplikasi
+│       └── main.go             # Entry point aplikasi
 │   └── migrate/
-│       └── main.go           # For running migrate
+│       └── main.go             # For running migrate
 ├── database/
-│   └── migrations_postgres/  # Folder for migrations
+│   └── migrations_postgres/    # Folder for migrations
 ├── internal/
 │   ├── config/
-│   │   └── environment.go    # Config file environment
+│   │   └── environment.go      # Config file environment
 │   ├── domain/
-│   │   └── health.go         # Model & Interface / Contract
+│   │   └── health.go           # Model & Interface / Contract
+│   ├── repository/
+│   │   └── user_repository.go  # Logic for get data contract from domain
 │   ├── service/
-│   │   └── health_service.go # Business logic
+│   │   └── health_service.go   # Business logic
 │   └── handler/
-│       └── health_handler.go # HTTP Handler (Gin Context)
+│       └── health_handler.go   # HTTP Handler (Gin Context)
 ├── pkg/
-│    └── database/
-│        └── seeder/
-│            ├── seeder.go          <-- Berisi RunAll(db)
-│            └── user_seeder.go     <-- Berisi SeedUsers(db)
-│    └── migration.go   # Module for migrate up/down
-│    └── postgres.go    # Module connection GORM
+│    ├── asynclock/
+│    |   └── sync_lock.go       # For snyc loc with mutex  
+│    ├── database/
+│    │   ├── seeder/
+│    │   │  ├── seeder.go       <-- Berisi RunAll(db)
+│    │   │  └── user_seeder.go  <-- Berisi SeedUsers(db)
+│    │   ├── migration.go       # Module for migrate up/down
+│    │   └── postgres.go        # Module connection GORM
+│    ├── response/
+│    │   ├── response_api.go  
+│    │   └── validator.go  
+│    ├── time/
+│    │   └── time.go  
+│    └── tokenize/
+│        └── tokenize.go  
+├── .ait.toml                   # For run mode dev with Air
+├── .env.example
+├── .gitignor
 ├── go.mod
 ├── go.sum
-└── Makefile    # Command for running
+└── Makefile                    # Command for running
 ```
 
 ## Migrations

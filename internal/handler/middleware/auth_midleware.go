@@ -1,11 +1,11 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"service_blog_go/internal/config"
 	"service_blog_go/pkg/tokenize"
 
-	"github.com/bytedance/gopkg/util/logger"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -14,7 +14,7 @@ func AuthMiddleware(env *config.Environment) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenString, err := ctx.Cookie("token")
 		if err != nil {
-			logger.CtxInfof(ctx, "Token is not found from cookie")
+			log.Println("Token is not found from cookie")
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token is not valid"})
 			ctx.Abort()
 			return
@@ -25,7 +25,7 @@ func AuthMiddleware(env *config.Environment) gin.HandlerFunc {
 			return []byte(env.JWTSecretKey), nil
 		})
 		if err != nil || !token.Valid {
-			logger.CtxInfof(ctx, "Token is not valid")
+			log.Println(ctx, "Token is not valid")
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token is not valid"})
 			ctx.Abort()
 			return
