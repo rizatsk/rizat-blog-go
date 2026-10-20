@@ -9,7 +9,7 @@ type AppError struct {
 }
 
 func (e *AppError) Error() string {
-	return fmt.Sprintf("code: %s, message: %s", e.Code, e.Message)
+	return fmt.Sprintf("code: %d, message: %s", e.Code, e.Message)
 }
 
 func NewAppError(code int, message string, err any) *AppError {
