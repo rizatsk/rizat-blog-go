@@ -29,9 +29,7 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 		formatedErr := response.FormValidationError(err)
 		response.Failed(
 			ctx,
-			http.StatusUnprocessableEntity,
-			"Bad request",
-			formatedErr,
+			response.NewAppError(400, "Bad request", formatedErr),
 		)
 
 		return
@@ -39,15 +37,9 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 
 	token, err := authHandler.authService.Login(ctx.Request.Context(), &req)
 	if err != nil {
-		statusCode := http.StatusInternalServerError
-		if err.Error() == "Email or password is wrong" {
-			statusCode = http.StatusUnauthorized
-		}
 		response.Failed(
 			ctx,
-			statusCode,
-			"Failed login",
-			err.Error(),
+			err,
 		)
 		return
 	}
@@ -66,16 +58,54 @@ func (authHandler *AuthHandler) Login(ctx *gin.Context) {
 		"refreshToken",           // name cookie
 		token.RefreshTokenString, // value cookie
 		authHandler.env.JWTRfreshTokenExpiredDays*24*60*int(time.Hour), // expired from second
-		"/api/v1/auth/refresh", // appicable path
-		"",                     // domain, (for localhost is blank)
-		false,                  // secure  (set true when using ssl)
-		true,                   // http only (javascript cannot read this cookie)
+		"/",   // appicable path
+		"",    // domain, (for localhost is blank)
+		false, // secure  (set true when using ssl)
+		true,  // http only (javascript cannot read this cookie)
 	)
 
 	response.Success(
 		ctx,
 		http.StatusOK,
 		"Login success",
+		nil,
+	)
+}
+
+func (authHandler *AuthHandler) RefreshToken(ctx *gin.Context) {
+	token, err := authHandler.authService.RefreshToken(ctx)
+	if err != nil {
+		response.Failed(
+			ctx,
+			err,
+		)
+		return
+	}
+
+	ctx.SetCookie(
+		"token",           // name cookie
+		token.TokenString, // value cookie
+		authHandler.env.JWTExpiredHours*60*60, // expired from second
+		"/",   // appicable path
+		"",    // domain, (for localhost is blank)
+		false, // secure  (set true when using ssl)
+		true,  // http only (javascript cannot read this cookie)
+	)
+
+	ctx.SetCookie(
+		"refreshToken",           // name cookie
+		token.RefreshTokenString, // value cookie
+		authHandler.env.JWTRfreshTokenExpiredDays*24*60*int(time.Hour), // expired from second
+		"/",   // appicable path
+		"",    // domain, (for localhost is blank)
+		false, // secure  (set true when using ssl)
+		true,  // http only (javascript cannot read this cookie)
+	)
+
+	response.Success(
+		ctx,
+		http.StatusOK,
+		"Refresh token success",
 		nil,
 	)
 }

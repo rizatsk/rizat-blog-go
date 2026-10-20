@@ -16,8 +16,8 @@ func NewauthTokenRepository(db *gorm.DB) domain.AuthTokenRepository {
 	return &authTokenRepository{db: db}
 }
 
-func (authTokenRepo *authTokenRepository) GetAuthTokenByUserId(ctx context.Context, userId string) ([]domain.AuthToken, error) {
-	var authToken []domain.AuthToken
+func (authTokenRepo *authTokenRepository) GetAuthTokenByUserId(ctx context.Context, userId string) ([]*domain.AuthToken, error) {
+	var authToken []*domain.AuthToken
 
 	err := authTokenRepo.db.WithContext(ctx).
 		Where("user_id=?", userId).
@@ -48,4 +48,22 @@ func (authTokenRepo *authTokenRepository) DeleteTokenByIds(ctx context.Context, 
 	}
 
 	return nil
+}
+
+func (authTokenRepo *authTokenRepository) DeleteTokenById(ctx context.Context, id string) error {
+	if err := authTokenRepo.db.WithContext(ctx).Where("id = ?", id).Delete(&domain.AuthToken{}).Error; err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (authTokenRepo *authTokenRepository) GetAuthTokenById(ctx context.Context, authId string) (*domain.AuthToken, error) {
+	var token domain.AuthToken
+
+	if err := authTokenRepo.db.WithContext(ctx).Where("id = ?", authId).Take(&token).Error; err != nil {
+		return nil, err
+	}
+
+	return &token, nil
 }

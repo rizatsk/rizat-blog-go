@@ -1,6 +1,7 @@
 package response
 
 import (
+	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -23,11 +24,21 @@ func Success(ctx *gin.Context, code int, message string, data any) {
 	})
 }
 
-func Failed(ctx *gin.Context, code int, message string, err any) {
-	ctx.JSON(code, ApiResponse{
-		Status:    "failed",
-		Message:   message,
-		Error:     err,
-		CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
-	})
+func Failed(ctx *gin.Context, err any) {
+	appErr, ok := err.(*AppError)
+	if ok {
+		ctx.JSON(appErr.Code, ApiResponse{
+			Status:    "failed",
+			Message:   appErr.Message,
+			Error:     appErr.ResultError,
+			CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+		})
+	} else {
+		ctx.JSON(http.StatusInternalServerError, ApiResponse{
+			Status:    "failed",
+			Message:   "Internal server error",
+			CreatedAt: time.Now().Format("2006-01-02 15:04:05"),
+		})
+	}
+
 }

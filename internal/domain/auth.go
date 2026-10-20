@@ -1,6 +1,10 @@
 package domain
 
-import "context"
+import (
+	"context"
+
+	"github.com/gin-gonic/gin"
+)
 
 type LoginRequest struct {
 	Email    string `json:"email" binding:"required,email"`
@@ -14,4 +18,10 @@ type Login struct {
 
 type AuthService interface {
 	Login(ctx context.Context, req *LoginRequest) (*Login, error)
+	RefreshToken(ctx *gin.Context) (*Login, error)
+}
+
+type DataRefreshToken struct {
+	AuthId string
+	UserId string
 }
