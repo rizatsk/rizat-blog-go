@@ -21,7 +21,7 @@ func NewUserService(userRepo domain.UserRepository, env *config.Environment) dom
 
 func (userService UserService) GetUser(ctx *gin.Context) *domain.GetUser {
 	return &domain.GetUser{
-		UserId:    ctx.MustGet("user_id").(string),
+		ID:        ctx.MustGet("user_id").(string),
 		Name:      ctx.MustGet("name").(string),
 		Email:     ctx.MustGet("email").(string),
 		Role:      ctx.MustGet("role").(string),

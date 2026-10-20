@@ -40,6 +40,7 @@ func main() {
 		v1.GET("/health", healthHandler.Ping)
 		v1.POST("/auth", authHandler.Login)
 		v1.GET("/user", middleware.AuthMiddleware(env), userHandler.GetUserByToken)
+		v1.GET("/auth/refresh-token", middleware.RefreshTokenMiddleware(env), authHandler.RefreshToken)
 	}
 
 	serverAddr := fmt.Sprintf(":%s", port)

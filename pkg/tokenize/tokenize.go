@@ -18,7 +18,7 @@ type JWTClaims struct {
 	jwt.RegisteredClaims
 }
 type JWTRefreshTokenClaims struct {
-	ID     string `json:"id"`
+	AuthID string `json:"id"`
 	UserID string `json:"user_id"`
 	jwt.RegisteredClaims
 }
@@ -45,7 +45,7 @@ func GenerateAccessToken(env *config.Environment, param *domain.User) (string, e
 
 func GenerateRefreshToken(env *config.Environment, authTokenId string, userId string) (string, error) {
 	claims := JWTRefreshTokenClaims{
-		ID:     authTokenId,
+		AuthID: authTokenId,
 		UserID: userId,
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(time.Now().Add(time.Duration(env.JWTRfreshTokenExpiredDays) * 24 * time.Hour)),

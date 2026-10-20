@@ -24,3 +24,13 @@ func (userRepo *userRepository) FindByEmail(ctx context.Context, email string) (
 	}
 	return &user, nil
 }
+
+func (userRepo *userRepository) FindByUserId(ctx context.Context, userId string) (*domain.User, error) {
+	var user domain.User
+
+	err := userRepo.db.WithContext(ctx).Table(user.TableName()).Where("id=?", userId).Take(&user).Error
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+}

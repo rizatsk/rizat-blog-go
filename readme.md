@@ -52,39 +52,43 @@ go mod tidy
 my-gin-app/
 ├── cmd/
 │   └── api/
-│       └── main.go             # Entry point aplikasi
+│       └── main.go                         # Entry point aplikasi
 │   └── migrate/
-│       └── main.go             # For running migrate
+│       └── main.go                         # For running migrate
 ├── database/
-│   └── migrations_postgres/    # Folder for migrations
+│   └── migrations_postgres/                # Folder for migrations
 ├── internal/
 │   ├── config/
-│   │   └── environment.go      # Config file environment
+│   │   └── environment.go                  # Config file environment
 │   ├── domain/
-│   │   └── health.go           # Model & Interface / Contract
+│   │   └── health.go                       # Model & Interface / Contract
 │   ├── repository/
-│   │   └── user_repository.go  # Logic for get data contract from domain
+│   │   └── user_repository.go              # Logic for get data contract from domain
 │   ├── service/
-│   │   └── health_service.go   # Business logic
+│   │   └── health_service.go               # Business logic
 │   └── handler/
-│       └── health_handler.go   # HTTP Handler (Gin Context)
+│       ├── middleware/
+│       │   ├── auth_middleware.go          # Checking valid token
+│       │   └── refreshtoken_middleware.go  # Checking valid refresh token
+│       └── health_handler.go               # HTTP Handler (Gin Context)
 ├── pkg/
 │    ├── asynclock/
-│    |   └── sync_lock.go       # For snyc loc with mutex  
+│    |   └── sync_lock.go                   # For snyc loc with mutex  
 │    ├── database/
 │    │   ├── seeder/
-│    │   │  ├── seeder.go       <-- Berisi RunAll(db)
-│    │   │  └── user_seeder.go  <-- Berisi SeedUsers(db)
-│    │   ├── migration.go       # Module for migrate up/down
-│    │   └── postgres.go        # Module connection GORM
+│    │   │  ├── seeder.go                   <-- Berisi RunAll(db)
+│    │   │  └── user_seeder.go              <-- Berisi SeedUsers(db)
+│    │   ├── migration.go                   # Module for migrate up/down
+│    │   └── postgres.go                    # Module connection GORM
 │    ├── response/
-│    │   ├── response_api.go  
-│    │   └── validator.go  
+│    │   ├── new_error.go                   # Send Error function to handler
+│    │   ├── response_api.go                # Handle error send to response
+│    │   └── validator.go                   # Handle validator from error validation json
 │    ├── time/
-│    │   └── time.go  
+│    │   └── time.go                        # Handle get time now used format
 │    └── tokenize/
 │        └── tokenize.go  
-├── .ait.toml                   # For run mode dev with Air
+├── .ait.toml                               # For run mode dev with Air
 ├── .env.example
 ├── .gitignor
 ├── go.mod
