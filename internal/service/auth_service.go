@@ -2,12 +2,14 @@ package service
 
 import (
 	"context"
+	"errors"
 	"log"
 	"service_blog_go/internal/config"
 	"service_blog_go/internal/domain"
 	"service_blog_go/pkg/asynclock"
 	"service_blog_go/pkg/response"
 	"service_blog_go/pkg/tokenize"
+	"sync"
 	"uuid"
 
 	"github.com/gin-gonic/gin"
@@ -130,19 +132,43 @@ func (authService *AuthService) RefreshToken(ctx *gin.Context) (*domain.Login, e
 		return nil, response.NewAppError(500, "", nil)
 	}
 
+	errChan := make(chan error, 2)
+	var waitGroup sync.WaitGroup
+	waitGroup.Add(2)
+	ctxBackground := context.Background()
+
 	// Delete token in table
-	var errDeleteToken error
-	errDeleteToken = authService.authRepo.DeleteTokenById(ctx, dataToken.AuthId)
-	if errDeleteToken != nil {
-		log.Printf("Failed delete token by id : %v", errDeleteToken)
-		return nil, response.NewAppError(500, "", nil)
-	}
+	go func() {
+		defer waitGroup.Done()
+
+		var errDeleteToken error
+		// errDeleteToken = authService.authRepo.DeleteTokenById(ctx, dataToken.AuthId)
+		errDeleteToken = authService.authRepo.DeleteTokenById(ctxBackground, dataToken.AuthId)
+		if errDeleteToken != nil {
+			log.Printf("Failed delete token by id : %v", errDeleteToken)
+			// return nil, response.NewAppError(500, "", nil)
+			errChan <- errors.New("Failed delete token by id")
+		}
+	}()
 
 	// Add token in table
-	var errInsertToken error
-	errInsertToken = authService.authRepo.InsertToken(ctx, authTokenId, user.ID)
-	if errInsertToken != nil {
-		log.Printf("Failed create token from table : %v", errInsertToken)
+	go func() {
+		defer waitGroup.Done()
+
+		var errInsertToken error
+		// errInsertToken = authService.authRepo.InsertToken(ctx, authTokenId, user.ID)
+		errInsertToken = authService.authRepo.InsertToken(ctxBackground, authTokenId, user.ID)
+		if errInsertToken != nil {
+			log.Printf("Failed create token from table : %v", errInsertToken)
+			// return nil, response.NewAppError(500, "", nil)
+			errChan <- errors.New("Failed create token by id")
+		}
+	}()
+
+	waitGroup.Wait()
+	close(errChan)
+
+	if len(errChan) > 0 {
 		return nil, response.NewAppError(500, "", nil)
 	}
 
